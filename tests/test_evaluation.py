@@ -1,3 +1,5 @@
+import pytest
+
 from src.evaluation import (
     evaluate_binary_classifier,
     get_confusion_matrix,
@@ -22,7 +24,7 @@ def test_evaluate_binary_classifier():
     assert results["precision"] == 1.0
     assert results["recall"] == 0.5
     assert results["f1"] > 0
-    assert results["roc_auc"] > 0
+    assert results["roc_auc"] == pytest.approx(1.0)
 
 
 def test_confusion_matrix():
