@@ -11,7 +11,16 @@ from sklearn.metrics import (
     f1_score,
     roc_auc_score,
     confusion_matrix,
+    ConfusionMatrixDisplay, 
+    RocCurveDisplay,
 )
+
+from sklearn.model_selection import (
+    cross_validate,
+    StratifiedKFold,
+)
+
+import matplotlib.pyplot as plt
 
 
 def evaluate_binary_classifier(
@@ -114,3 +123,109 @@ def results_to_dataframe(results: list[dict]) -> pd.DataFrame:
         results,
         columns=columns,
     )
+
+def plot_confusion_matrix(
+    y_true,
+    y_pred,
+    model_name: str,
+):
+    """
+    Plot a confusion matrix for a binary classifier.
+    """
+
+    display = ConfusionMatrixDisplay.from_predictions(
+        y_true,
+        y_pred,
+        display_labels=["No", "Yes"],
+    )
+
+    display.ax_.set_title(
+        f"{model_name} - Confusion Matrix"
+    )
+
+    plt.tight_layout()
+
+    return display
+
+def plot_roc_curve(
+    y_true,
+    y_score,
+    model_name: str,
+):
+    """
+    Plot the ROC curve for a binary classifier.
+    """
+
+    display = RocCurveDisplay.from_predictions(
+        y_true,
+        y_score,
+        name=model_name,
+    )
+
+    display.ax_.plot(
+        [0, 1],
+        [0, 1],
+        linestyle="--",
+        label="Random classifier",
+    )
+
+    display.ax_.set_title(
+        f"{model_name} - ROC Curve"
+    )
+
+    display.ax_.legend()
+
+    plt.tight_layout()
+
+    return display
+
+def cross_validate_classifier(
+    model_name: str,
+    estimator,
+    X,
+    y,
+    cv: int = 5,
+) -> dict:
+    """
+    Evaluate a classifier using cross-validation.
+
+    Returns mean and standard deviation for the project's
+    standard classification metrics.
+    """
+
+    scoring = {
+        "accuracy": "accuracy",
+        "precision": "precision",
+        "recall": "recall",
+        "f1": "f1",
+        "roc_auc": "roc_auc",
+    }
+
+    scores = cross_validate(
+        estimator,
+        X,
+        y,
+        cv=cv,
+        scoring=scoring,
+    )
+
+    results = {
+        "model": model_name,
+    }
+
+    for metric in scoring:
+        values = scores[f"test_{metric}"]
+
+        results[f"{metric}_mean"] = values.mean()
+        results[f"{metric}_std"] = values.std()
+
+    return results
+
+def cross_validation_results_to_dataframe(
+    results: list[dict],
+) -> pd.DataFrame:
+    """
+    Convert cross-validation result dictionaries into a DataFrame.
+    """
+
+    return pd.DataFrame(results)
