@@ -11,7 +11,7 @@ from sklearn.metrics import (
     f1_score,
     roc_auc_score,
     confusion_matrix,
-    ConfusionMatrixDisplay, 
+    ConfusionMatrixDisplay,
     RocCurveDisplay,
     make_scorer,
 )
@@ -125,6 +125,7 @@ def results_to_dataframe(results: list[dict]) -> pd.DataFrame:
         columns=columns,
     )
 
+
 def plot_confusion_matrix(
     y_true,
     y_pred,
@@ -147,6 +148,7 @@ def plot_confusion_matrix(
     plt.tight_layout()
 
     return display
+
 
 def plot_roc_curve(
     y_true,
@@ -179,6 +181,7 @@ def plot_roc_curve(
     plt.tight_layout()
 
     return display
+
 
 def cross_validate_classifier(
     model_name: str,
@@ -237,6 +240,8 @@ def cross_validate_classifier(
         results[f"{metric}_std"] = values.std()
 
     return results
+
+
 
 def cross_validation_results_to_dataframe(
     results: list[dict],
