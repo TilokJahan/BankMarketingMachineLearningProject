@@ -13,6 +13,7 @@ from sklearn.metrics import (
     confusion_matrix,
     ConfusionMatrixDisplay, 
     RocCurveDisplay,
+    make_scorer,
 )
 
 from sklearn.model_selection import (
@@ -195,17 +196,33 @@ def cross_validate_classifier(
 
     scoring = {
         "accuracy": "accuracy",
-        "precision": "precision",
-        "recall": "recall",
-        "f1": "f1",
+        "precision": make_scorer(
+            precision_score,
+            zero_division=0,
+        ),
+        "recall": make_scorer(
+            recall_score,
+            zero_division=0,
+        ),
+        "f1": make_scorer(
+            f1_score,
+            zero_division=0,
+        ),
         "roc_auc": "roc_auc",
     }
+
+    cv_strategy = StratifiedKFold(
+        n_splits=cv,
+        shuffle=True,
+        random_state=42,
+    )
+
 
     scores = cross_validate(
         estimator,
         X,
         y,
-        cv=cv,
+        cv=cv_strategy,
         scoring=scoring,
     )
 

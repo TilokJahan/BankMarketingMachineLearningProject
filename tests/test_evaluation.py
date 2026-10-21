@@ -1,7 +1,11 @@
+import matplotlib
+matplotlib.use("Agg")
+
 import pytest
 
 from src.evaluation import (
     cross_validate_classifier,
+    cross_validation_results_to_dataframe,
     evaluate_binary_classifier,
     get_confusion_matrix,
     plot_confusion_matrix,
@@ -9,11 +13,11 @@ from src.evaluation import (
     results_to_dataframe,
 )
 
-import matplotlib
-matplotlib.use("Agg")
-
 
 from sklearn.dummy import DummyClassifier
+
+import numpy as np
+
 
 def test_evaluate_binary_classifier():
     y_true = [0, 0, 1, 1]
@@ -74,7 +78,15 @@ def test_plot_confusion_matrix():
         model_name="Test Model",
     )
 
-    assert display.confusion_matrix.shape == (2, 2)
+    expected = np.array([
+        [2, 0],
+        [1, 1],
+    ])
+
+    np.testing.assert_array_equal(
+        display.confusion_matrix,
+        expected,
+    )
 
 def test_plot_roc_curve():
     y_true = [0, 0, 1, 1]
@@ -123,3 +135,26 @@ def test_cross_validate_classifier():
     assert "accuracy_mean" in results
     assert "recall_mean" in results
     assert "roc_auc_mean" in results
+
+
+def test_cross_validation_results_to_dataframe():
+    results = [
+        {
+            "model": "Model A",
+            "accuracy_mean": 0.8,
+            "accuracy_std": 0.01,
+            "precision_mean": 0.7,
+            "precision_std": 0.02,
+            "recall_mean": 0.6,
+            "recall_std": 0.03,
+            "f1_mean": 0.65,
+            "f1_std": 0.02,
+            "roc_auc_mean": 0.75,
+            "roc_auc_std": 0.01,
+        }
+    ]
+
+    df = cross_validation_results_to_dataframe(results)
+
+    assert len(df) == 1
+    assert df.loc[0, "model"] == "Model A"
