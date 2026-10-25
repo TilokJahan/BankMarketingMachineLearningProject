@@ -1,9 +1,12 @@
+import pandas as pd
+
 from sklearn.discriminant_analysis import (
     QuadraticDiscriminantAnalysis,
 )
 from sklearn.naive_bayes import GaussianNB
 
 from src.models import get_student3_models
+from src.preprocessing import build_preprocessor
 
 
 def test_get_student3_models():
@@ -23,9 +26,6 @@ def test_get_student3_models():
         GaussianNB,
     )
 
-import pandas as pd
-
-from src.preprocessing import build_preprocessor
 
 
 def test_dense_preprocessor_output():
@@ -51,4 +51,28 @@ def test_dense_preprocessor_output():
     assert not hasattr(
         transformed,
         "toarray",
-    )  
+    )
+
+
+def test_drop_first_reduces_dummy_columns():
+    X = pd.DataFrame(
+        {
+            "age": [25, 40, 55],
+            "job": [
+                "student",
+                "admin.",
+                "technician",
+            ],
+        }
+    )
+
+    preprocessor = build_preprocessor(
+        numeric_features=["age"],
+        categorical_features=["job"],
+        dense_output=True,
+        drop_first=True,
+    )
+
+    transformed = preprocessor.fit_transform(X)
+
+    assert transformed.shape[1] == 3

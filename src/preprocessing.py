@@ -21,6 +21,11 @@ def build_preprocessor(
         Numeric predictor column names.
     categorical_features : list[str]
         Categorical predictor column names.
+    dense_output : bool, default=False
+        If True, configure one-hot encoding to return dense output.
+    drop_first : bool, default=False
+        If True, drop the first category from each categorical feature
+        to reduce dummy-variable collinearity.
 
     Returns
     -------
