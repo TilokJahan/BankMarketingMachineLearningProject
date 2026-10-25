@@ -24,3 +24,16 @@ def get_candidate_models():
         "qda": QuadraticDiscriminantAnalysis(),
         "gaussian_nb": GaussianNB(),
     }
+
+def get_student3_models():
+    """
+    Return the classifiers assigned to Student 3.
+    """
+    return {
+        "Quadratic Discriminant Analysis":
+            QuadraticDiscriminantAnalysis(
+                    reg_param=0.1
+                ),
+        "Gaussian Naive Bayes":
+            GaussianNB(),
+    }
