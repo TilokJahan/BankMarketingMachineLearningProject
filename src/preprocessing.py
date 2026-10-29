@@ -6,7 +6,12 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
 
 
-def build_preprocessor(numeric_features, categorical_features):
+def build_preprocessor(
+    numeric_features,
+    categorical_features,
+    dense_output: bool = False,
+    drop_first: bool = False,
+):
     """
     Create a preprocessing pipeline for mixed numeric/categorical data.
 
@@ -16,6 +21,11 @@ def build_preprocessor(numeric_features, categorical_features):
         Numeric predictor column names.
     categorical_features : list[str]
         Categorical predictor column names.
+    dense_output : bool, default=False
+        If True, configure one-hot encoding to return dense output.
+    drop_first : bool, default=False
+        If True, drop the first category from each categorical feature
+        to reduce dummy-variable collinearity.
 
     Returns
     -------
@@ -33,7 +43,14 @@ def build_preprocessor(numeric_features, categorical_features):
     categorical_pipeline = Pipeline(
         steps=[
             ("imputer", SimpleImputer(strategy="most_frequent")),
-            ("onehot", OneHotEncoder(handle_unknown="ignore")),
+            (
+                "onehot",
+                OneHotEncoder(
+                    handle_unknown="ignore",
+                    sparse_output=not dense_output,
+                    drop="first" if drop_first else None,
+                ),
+            ),
         ]
     )
 
