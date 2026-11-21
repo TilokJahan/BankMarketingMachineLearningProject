@@ -4,6 +4,8 @@ matplotlib.use("Agg")
 import pytest
 
 from src.evaluation import (
+    bootstrap_classification_metrics,
+    bootstrap_results_to_dataframe,    
     cross_validate_classifier,
     cross_validation_results_to_dataframe,
     evaluate_binary_classifier,
@@ -155,6 +157,77 @@ def test_cross_validation_results_to_dataframe():
     ]
 
     df = cross_validation_results_to_dataframe(results)
+
+    assert len(df) == 1
+    assert df.loc[0, "model"] == "Model A"
+
+def test_bootstrap_classification_metrics():
+    y_true = [
+        0, 0, 0, 0, 0,
+        1, 1, 1, 1, 1,
+    ]
+
+    y_pred = [
+        0, 0, 0, 0, 1,
+        0, 1, 1, 1, 1,
+    ]
+
+    y_score = [
+        0.05,
+        0.10,
+        0.20,
+        0.25,
+        0.60,
+        0.30,
+        0.65,
+        0.75,
+        0.85,
+        0.95,
+    ]
+
+    results = bootstrap_classification_metrics(
+        model_name="Test Model",
+        y_true=y_true,
+        y_pred=y_pred,
+        y_score=y_score,
+        n_bootstrap=100,
+        random_state=42,
+    )
+
+    assert results["model"] == "Test Model"
+
+    assert results["n_bootstrap"] == 100
+
+    assert "accuracy_ci_lower" in results
+    assert "accuracy_ci_upper" in results
+
+    assert "f1_ci_lower" in results
+    assert "f1_ci_upper" in results
+
+    assert "roc_auc_ci_lower" in results
+    assert "roc_auc_ci_upper" in results
+
+    assert (
+        results["accuracy_ci_lower"]
+        <= results["accuracy"]
+        <= results["accuracy_ci_upper"]
+    )
+
+
+def test_bootstrap_results_to_dataframe():
+
+    results = [
+        {
+            "model": "Model A",
+            "accuracy": 0.8,
+            "accuracy_ci_lower": 0.7,
+            "accuracy_ci_upper": 0.9,
+        }
+    ]
+
+    df = bootstrap_results_to_dataframe(
+        results
+    )
 
     assert len(df) == 1
     assert df.loc[0, "model"] == "Model A"
