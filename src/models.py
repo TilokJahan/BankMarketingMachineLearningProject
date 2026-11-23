@@ -2,11 +2,14 @@
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.discriminant_analysis import (
     LinearDiscriminantAnalysis,
     QuadraticDiscriminantAnalysis,
 )
 from sklearn.naive_bayes import GaussianNB
+
+
 
 
 def get_candidate_models():
@@ -38,4 +41,18 @@ def get_student3_models():
             ),
         "Gaussian Naive Bayes":
             GaussianNB(),
+    }
+
+def get_supplementary_models():
+    """
+    Return supplementary classifiers evaluated beyond the
+    project's five primary candidate models.
+    """
+    return {
+        "Random Forest": RandomForestClassifier(
+            n_estimators=300,
+            class_weight="balanced",
+            random_state=42,
+            n_jobs=-1,
+        ),
     }
