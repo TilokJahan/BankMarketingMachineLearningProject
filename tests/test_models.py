@@ -4,8 +4,11 @@ from sklearn.discriminant_analysis import (
     QuadraticDiscriminantAnalysis,
 )
 from sklearn.naive_bayes import GaussianNB
-
-from src.models import get_student3_models
+from sklearn.ensemble import RandomForestClassifier
+from src.models import (
+    get_student3_models,
+    get_supplementary_models,
+)
 from src.preprocessing import build_preprocessor
 
 
@@ -76,3 +79,15 @@ def test_drop_first_reduces_dummy_columns():
     transformed = preprocessor.fit_transform(X)
 
     assert transformed.shape[1] == 3
+
+def test_get_supplementary_models():
+    models = get_supplementary_models()
+
+    assert isinstance(
+        models["Random Forest"],
+        RandomForestClassifier,
+    )
+
+    assert models["Random Forest"].n_estimators == 300
+    assert models["Random Forest"].class_weight == "balanced"
+    assert models["Random Forest"].random_state == 42
